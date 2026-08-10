@@ -1,0 +1,76 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/tomcat
+- name: Install required packages
+  ansible.builtin.apt:
+    name:
+      - openjdk-17-jdk
+      - wget
+      - tar
+    state: present
+    update_cache: yes
+
+- name: Create tomcat group
+  ansible.builtin.group:
+    name: "{{ tomcat_group }}"
+    state: present
+
+- name: Create tomcat user
+  ansible.builtin.user:
+    name: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    shell: /bin/false
+    create_home: false
+    state: present
+
+- name: Create Tomcat installation directory
+  ansible.builtin.file:
+    path: "{{ tomcat_install_dir }}"
+    state: directory
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    mode: "0755"
+
+- name: Download Tomcat binary
+  ansible.builtin.get_url:
+    url: "{{ tomcat_download_url }}"
+    dest: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    mode: "0644"
+
+- name: Extract Tomcat binary
+  ansible.builtin.unarchive:
+    src: "/tmp/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    dest: "{{ tomcat_install_dir }}"
+    remote_src: yes
+    creates: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}"
+
+- name: Create symbolic link
+  ansible.builtin.file:
+    src: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}"
+    dest: "{{ tomcat_install_dir }}/current"
+    state: link
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+
+- name: Change Tomcat ownership
+  ansible.builtin.file:
+    path: "{{ tomcat_install_dir }}/apache-tomcat-{{ tomcat_version }}"
+    owner: "{{ tomcat_user }}"
+    group: "{{ tomcat_group }}"
+    recurse: yes
+
+- name: Create Tomcat systemd service
+  ansible.builtin.template:
+    src: tomcat.service.j2
+    dest: /etc/systemd/system/tomcat.service
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart tomcat
+
+- name: Start and enable Tomcat
+  ansible.builtin.systemd:
+    name: tomcat
+    state: started
+    enabled: yes
+    daemon_reload: yes

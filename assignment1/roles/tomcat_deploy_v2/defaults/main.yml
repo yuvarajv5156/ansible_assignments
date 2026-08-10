@@ -1,0 +1,14 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/version2
+tomcat_service: tomcat
+
+tomcat_home: /opt/tomcat/current
+
+tomcat_webapps: "{{ tomcat_home }}/webapps"
+
+backup_dir: /opt/tomcat/backup
+
+war_name: book-seller.war
+
+health_url: "http://localhost:8080/book-seller/"

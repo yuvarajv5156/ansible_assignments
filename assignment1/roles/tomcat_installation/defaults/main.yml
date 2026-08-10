@@ -1,0 +1,11 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/tomcat
+
+tomcat_version: "10.1.57"
+tomcat_user: "tomcat"
+tomcat_group: "tomcat"
+
+tomcat_install_dir: "/opt/tomcat"
+
+tomcat_download_url: "https://dlcdn.apache.org/tomcat/tomcat-10/v{{ tomcat_version }}/bin/apache-tomcat-{{ tomcat_version }}.tar.gz"

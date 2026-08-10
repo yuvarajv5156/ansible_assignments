@@ -1,0 +1,74 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/version2
+- name: Create backup directory
+  ansible.builtin.file:
+    path: "{{ backup_dir }}"
+    state: directory
+    owner: tomcat
+    group: tomcat
+    mode: "0755"
+
+- name: Stop Tomcat
+  ansible.builtin.systemd:
+    name: "{{ tomcat_service }}"
+    state: stopped
+
+- name: Check existing WAR
+  ansible.builtin.stat:
+    path: "{{ tomcat_webapps }}/{{ war_name }}"
+  register: existing_war
+
+- name: Backup existing WAR
+  ansible.builtin.copy:
+    src: "{{ tomcat_webapps }}/{{ war_name }}"
+    dest: "{{ backup_dir }}/{{ war_name }}.backup"
+    remote_src: yes
+    owner: tomcat
+    group: tomcat
+    mode: "0644"
+  when: existing_war.stat.exists
+
+- name: Remove old WAR
+  ansible.builtin.file:
+    path: "{{ tomcat_webapps }}/{{ war_name }}"
+    state: absent
+
+- name: Remove extracted application
+  ansible.builtin.file:
+    path: "{{ tomcat_webapps }}/{{ war_name | regex_replace('\\.war$', '') }}"
+    state: absent
+
+- name: Deploy new WAR
+  ansible.builtin.copy:
+    src: "{{ war_name }}"
+    dest: "{{ tomcat_webapps }}/{{ war_name }}"
+    owner: tomcat
+    group: tomcat
+    mode: "0644"
+
+- name: Start Tomcat
+  ansible.builtin.systemd:
+    name: "{{ tomcat_service }}"
+    state: started
+    enabled: yes
+
+- name: Wait for Tomcat
+  ansible.builtin.wait_for:
+    host: 127.0.0.1
+    port: 8080
+    delay: 5
+    timeout: 60
+
+- name: Check application health
+  ansible.builtin.uri:
+    url: "{{ health_url }}"
+    status_code: 200
+  register: health_check
+  retries: 10
+  delay: 5
+  until: health_check.status == 200
+
+- name: Display health status
+  ansible.builtin.debug:
+    msg: "Application deployed successfully. HTTP status: {{ health_check.status }}"

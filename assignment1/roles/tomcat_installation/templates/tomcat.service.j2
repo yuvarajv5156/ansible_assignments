@@ -1,0 +1,21 @@
+[Unit]
+Description=Apache Tomcat
+After=network.target
+
+[Service]
+Type=forking
+
+User=tomcat
+Group=tomcat
+
+Environment="JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64"
+Environment="CATALINA_HOME=/opt/tomcat/current"
+Environment="CATALINA_BASE=/opt/tomcat/current"
+
+ExecStart=/opt/tomcat/current/bin/startup.sh
+ExecStop=/opt/tomcat/current/bin/shutdown.sh
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

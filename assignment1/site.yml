@@ -1,0 +1,7 @@
+---
+- name: Deploying version2
+  hosts: tomcat
+  become: yes
+
+  roles:
+    - tomcat_deploy_v2
