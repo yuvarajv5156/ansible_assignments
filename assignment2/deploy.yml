@@ -1,0 +1,16 @@
+---
+- name: Deploy application
+  hosts: all
+  become: true
+
+  vars_files:
+    - secrets.yml
+
+  tasks:
+    - name: Show database username
+      ansible.builtin.debug:
+        msg: "Database user is {{ db_username }}"
+
+    - name: Use database password
+      ansible.builtin.debug:
+        msg: "Database password is {{ db_password }}"
