@@ -1,0 +1,23 @@
+---
+- name: Install Tomcat 10 and change port
+  hosts: tomcatservers
+  become: true
+
+  tasks:
+    - name: Install Tomcat 10
+      ansible.builtin.apt:
+        name: tomcat10
+        state: present
+        update_cache: yes
+
+    - name: Change Tomcat port from 8080 to 9090
+      ansible.builtin.replace:
+        path: /etc/tomcat10/server.xml
+        regexp: 'port="8080"'
+        replace: 'port="9090"'
+
+    - name: Restart Tomcat service
+      ansible.builtin.systemd:
+        name: tomcat10
+        state: restarted
+        enabled: true

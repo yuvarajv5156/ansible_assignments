@@ -1,0 +1,22 @@
+---
+- name: Get Target Instances Report
+  hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+    - name: Display Hostname
+      ansible.builtin.debug:
+        msg: "Hostname: {{ ansible_hostname }}"
+
+    - name: Display CPU
+      ansible.builtin.debug:
+        msg: "CPU: {{ ansible_processor_vcpus }} cores"
+
+    - name: Display RAM
+      ansible.builtin.debug:
+        msg: "RAM: {{ ansible_memtotal_mb }} MB"
+
+    - name: Display Storage
+      ansible.builtin.debug:
+        msg: "Storage: {{ ansible_mounts[0].size_total | human_readable }}"
