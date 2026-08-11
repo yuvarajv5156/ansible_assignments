@@ -1,4 +1,4 @@
-# Ansible Assignment 1 – Tomcat Installation and Application Deployment
+# Assignment 1 – Tomcat Installation and Application Deployment
 
 ## Overview
 
