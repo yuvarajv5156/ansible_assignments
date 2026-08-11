@@ -342,8 +342,10 @@ Add:
 
 ```ini
 [defaults]
-inventory = aws_ec2.yml
+inventory = /home/ubuntu/ansible_assignments/assignment3/inventory/aws_ec2.yml
 host_key_checking = False
+private_key_file = /home/ubuntu/ansible_assignments/assignment3/yuvaraj-aws.pem
+remote_user = ubuntu
 ```
 
 Now Ansible automatically uses `aws_ec2.yml` as the inventory.
