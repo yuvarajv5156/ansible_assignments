@@ -1,0 +1,7 @@
+.cache/
+.ssh/
+.bash_logout
+.bashrc
+.lesshst
+.profile
+.viminfo
